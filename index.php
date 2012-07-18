@@ -1,6 +1,7 @@
 <?php
 require_once './restler/restler.php';
-require_once './classes/anime.php';
+require_once './controllers/anime.php';
+
 
 $r = new Restler();
 $r->addAPIClass('Anime');
