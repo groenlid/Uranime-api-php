@@ -1,0 +1,6 @@
+[submodule "vendors/propel"]
+	path = vendors/propel
+	url = https://github.com/propelorm/Propel2.git
+[submodule "vendors/restler"]
+	path = vendors/restler
+	url = git://github.com/Luracast/Restler.git

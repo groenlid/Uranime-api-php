@@ -1,10 +1,5 @@
 <?php
 class Anime {
-    function hello($to='world')
-    {
-        return "Hello $to!";
-    }
-    
 
     /**
      * Returns a collection of anime sorted by Anime.id
@@ -32,6 +27,11 @@ class Anime {
         // We need to require the user to give an id
 
         $anime = R::load('anime',$id);
+        
+        // If only one anime is requested, we add the relationships.
+        // (Episodes, Synonyms, etc)
+
+        $episodes = $anime->ownEpisodes;
 
         return $anime;
     }

@@ -2,10 +2,8 @@
 /**
  * @Entity @Table(name="anime")
  **/
-class Anime
+class Model_Anime extends Redbean_SimpleModel
 {
-    /** @Id @Column(type="integer") @GeneratedValue **/
     protected $id;
-    /** @Column(type="string") **/
     protected $title;
 }
