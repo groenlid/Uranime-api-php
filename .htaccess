@@ -5,6 +5,7 @@ RewriteRule ^$ index.php [QSA,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]
+RewriteRule .? - [E=Authorization:%{HTTP:Authorization}]
 </IfModule>
 <IfModule mod_php5.c>
 php_flag display_errors Off

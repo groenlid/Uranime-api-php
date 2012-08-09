@@ -8,8 +8,12 @@ class Authenticate implements iAuthenticate {
 
         $headers = apache_request_headers();
         if(!isset($headers['Authorization']))
+            $auth = $_SERVER['Authorization'];
+        else
+            $auth = $headers['Authorization'];
+        if(!isset($auth))
             return FALSE;
-        $auth = $headers['Authorization'];
+        
 
         $authparams = explode(':',$auth);
 
