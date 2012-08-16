@@ -5,6 +5,7 @@ require_once getcwd().'/controllers/anime.php';
 require_once getcwd().'/controllers/episodes.php';
 require_once getcwd().'/controllers/users.php';
 require_once getcwd().'/controllers/search.php';
+require_once getcwd().'/controllers/tags.php';
 require_once getcwd().'/rb.php';
 require_once getcwd().'/config/db.php';
 
@@ -17,6 +18,7 @@ $r->addAPIClass('Anime');
 $r->addAPIClass('Episodes');
 $r->addAPIClass('Users');
 $r->addAPIClass('Search');
+$r->addAPIClass('Tags');
 $r->addAPIClass('Auth');
 $r->handle();
 

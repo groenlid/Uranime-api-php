@@ -47,6 +47,19 @@ class Anime {
                 'anime_id' => $id
                 )
             );
+
+        // Find the tags assosiated with the anime
+        $tags = R::getAll(
+            'SELECT genre.id, name, description
+            FROM genre, anime_genre
+            WHERE anime_genre.anime_id = :anime_id
+            AND anime_genre.genre_id = genre.id
+            ',
+            array(
+                ':anime_id' => $id
+                )
+            );
+        
         
         $auth = new Authenticate();
 
@@ -88,7 +101,7 @@ class Anime {
 
         $anime->episodes = $episodes;
         $anime->synonyms = $synonyms;
- 
+        $anime->tags = $tags;
         return $anime;
     }
 

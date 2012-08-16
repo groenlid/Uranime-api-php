@@ -2,12 +2,46 @@
 class Search{
 
     public function get($q=""){
-        $q = strtolower(trim($_GET['q']));
+        
+        $tag_id = $_GET['tag_id'];
+        if($tag_id != null && !is_numeric($tag_id))
+            throw new RestException(400, "Wrong format of tag_id. Should be int");
+
+        else if($tag_id != null){
+            $anime_genre = R::find(
+                'anime_genre',
+                'genre_id = :genre_id',
+                array(
+                    'genre_id' => $tag_id
+                    )
+                );
+            $anime = array();
+            foreach($anime_genre as $singleGenre)
+            {
+                $anime_id = $singleGenre['anime_id'];
+                $anime[$anime_id] = R::load('anime',$anime_id);
+                $anime[$anime_id]['tags'] = R::getAll(
+                    'SELECT genre.id, name, description
+                    FROM genre, anime_genre
+                    WHERE anime_genre.anime_id = :anime_id
+                    AND anime_genre.genre_id = genre.id
+                    ',
+                    array(
+                        ':anime_id' => $anime_id
+                    )
+                );
+
+            }
+            return $anime;
+        }
+
+        if(isset($_GET['q']))
+            $q = strtolower(trim($_GET['q']));
         if(empty($q))
-            throw new RestlerException(404,"No query given. Use ?q= to query");
+            throw new RestException(404,"No query given. Use ?q= to query");
         $synonyms = R::find(
             'anime_synonyms',
-            'title LIKE ?',
+            'lower(title) LIKE ?',
             array(
                  '%'.$q.'%'
                 )
