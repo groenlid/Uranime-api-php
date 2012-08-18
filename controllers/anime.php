@@ -132,11 +132,21 @@ class Anime {
         // Update the watchlist timestamp status
         $updatedWatchlist = $this->updateWatchlist($request_data, $userid, $id);
 
+        
+        $episodesAdded = 0;
 
         // Update the watched status for the episodes
         if(array_key_exists('episodes',$request_data))
             foreach($request_data['episodes'] as $episodeid => $episode)
-                $this->updateEpisode($episode, $userid, $episodeid);
+                $episodesAdded += ($this->updateEpisode($episode, $userid, $episodeid) ? 1 : 0);
+
+        // Update the scrape for the anime
+        if($episodesAdded != 0)
+            R::exec(
+                'UPDATE scrape_info 
+                SET scrape_needed=1 
+                WHERE anime_id=' . $anime['id']
+            );
 
         // Return the updated anime with updated episodes
         return $this->get($id);
@@ -207,7 +217,7 @@ class Anime {
                 $userseen->timestamp = date( TIMESTAMP_FORMAT, $time);
                 
                 R::store($userseen);
-                
+
                 return TRUE;
             }
         }

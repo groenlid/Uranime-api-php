@@ -20,7 +20,16 @@ class Search{
             {
                 $anime_id = $singleGenre['anime_id'];
                 $anime[$anime_id] = R::load('anime',$anime_id);
-                $anime[$anime_id]['tags'] = R::getAll(
+                $anime[$anime_id]['tags'] = R::find(
+                    'genre',
+                    'genre.id = :genre_id',
+                    array(
+                        'genre_id' => $singleGenre['genre_id']
+                    )
+                );
+
+                /* THIS FETCHES ALL THE TAGS FOR EACH ANIME.. TO BIG FOR ANDROID APP   
+                R::getAll(
                     'SELECT genre.id, name, description
                     FROM genre, anime_genre
                     WHERE anime_genre.anime_id = :anime_id
@@ -30,6 +39,7 @@ class Search{
                         ':anime_id' => $anime_id
                     )
                 );
+                 */
 
             }
             return $anime;
