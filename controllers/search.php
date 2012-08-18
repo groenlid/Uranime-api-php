@@ -3,7 +3,7 @@ class Search{
 
     public function get($q=""){
         
-        $tag_id = $_GET['tag_id'];
+        $tag_id = isset($_GET['tag_id']) ? $_GET['tag_id'] : null;
         if($tag_id != null && !is_numeric($tag_id))
             throw new RestException(400, "Wrong format of tag_id. Should be int");
 

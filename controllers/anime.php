@@ -49,8 +49,8 @@ class Anime {
             );
 
         // Find the tags assosiated with the anime
-        $tags = R::getAll(
-            'SELECT genre.id, name, description
+        $tags_rawSQL = R::getAll(
+            'SELECT genre.id, name, description, is_genre
             FROM genre, anime_genre
             WHERE anime_genre.anime_id = :anime_id
             AND anime_genre.genre_id = genre.id
@@ -59,7 +59,10 @@ class Anime {
                 ':anime_id' => $id
                 )
             );
-        
+        $tags = array();
+
+        foreach($tags_rawSQL as $tag)
+            $tags[$tag['id']] = $tag;
         
         $auth = new Authenticate();
 
@@ -141,7 +144,7 @@ class Anime {
                 $changesDone += ($this->updateEpisode($episode, $userid, $episodeid) ? 1 : 0);
 
         // Update the scrape for the anime
-        if($changesDone != 0)
+        if($changesDone != 0 && (!isset($anime['status']) || $anime['status'] != 'finished'))
             R::exec(
                 'UPDATE scrape_info 
                 SET scrape_needed=1 
