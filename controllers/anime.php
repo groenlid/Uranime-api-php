@@ -128,20 +128,20 @@ class Anime {
         if(is_null($anime) || !$anime->id)
             throw new RestException(404, 'The anime with id ' . $id . ' does not exist.');
 
+        $changesDone = 0;
 
         // Update the watchlist timestamp status
         $updatedWatchlist = $this->updateWatchlist($request_data, $userid, $id);
 
-        
-        $episodesAdded = 0;
+        $changesDone += ($updatedWatchlist) ? 1 : 0 ;
 
         // Update the watched status for the episodes
         if(array_key_exists('episodes',$request_data))
             foreach($request_data['episodes'] as $episodeid => $episode)
-                $episodesAdded += ($this->updateEpisode($episode, $userid, $episodeid) ? 1 : 0);
+                $changesDone += ($this->updateEpisode($episode, $userid, $episodeid) ? 1 : 0);
 
         // Update the scrape for the anime
-        if($episodesAdded != 0)
+        if($changesDone != 0)
             R::exec(
                 'UPDATE scrape_info 
                 SET scrape_needed=1 
