@@ -217,7 +217,7 @@ class Anime {
                 }
 
                 $time = strtotime($seen);
-                $userseen->timestamp = date( TIMESTAMP_FORMAT, $time);
+                $userseen->timestamp = date( TIMESTAMP_FORMAT, time() );//date( TIMESTAMP_FORMAT, $time);
                 
                 R::store($userseen);
 
