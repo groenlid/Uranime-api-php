@@ -108,7 +108,7 @@ class Anime {
         return $anime;
     }
 
-    protected function put($id = null, $request_data = null)
+    public function put($id = null, $request_data = null)
     {
         // Fetch the request_data
         
@@ -120,11 +120,24 @@ class Anime {
         }
         if(is_null($request_data) || empty($request_data))
             throw new RestException(400, 'No input data was given!');
-        
-        
-
+            
         // Check if the anime exists & find the userid
         $anime = R::load('anime',$id);
+        
+        // Check if the user is logged in
+        $auth = new Authenticate();
+
+        // If the user is logged in..
+        if(!$auth->__isAuthenticated())
+        {
+            // Check if the user wants to update the scrape for the anime
+            if(isset($request_data['update']))
+                $this->setScrape($id,$anime);
+            $this->get($id);
+        }
+
+        
+
         $userid = Authenticate::$loggedInAs;
 
 
@@ -144,16 +157,34 @@ class Anime {
                 $changesDone += ($this->updateEpisode($episode, $userid, $episodeid) ? 1 : 0);
 
         // Update the scrape for the anime
-        if($changesDone != 0 && (!isset($anime['status']) || $anime['status'] != 'finished'))
-            R::exec(
-                'UPDATE scrape_info 
-                SET scrape_needed=1 
-                WHERE anime_id=' . $anime['id']
-            );
+        if($changesDone != 0 || isset($request_data['update']))
+             $this->setScrape($id, $anime);
 
         // Return the updated anime with updated episodes
         return $this->get($id);
 
+    }
+
+    private function setScrape($anime_id, $anime_db_object)
+    {
+        if(!is_numeric($anime_id))
+            throw new RestException(
+                400, 
+                'Anime id is of the wrong type. Should be integer'
+            );
+        
+        $anime  = ($anime_db_object == null) 
+            ? R::load('anime',$anime_id) 
+            : $anime_db_object;
+        
+        if(!isset($anime['status']) || $anime['status'] != 'finished')
+            return R::exec(
+                'UPDATE scrape_info
+                SET scrape_needed=1
+                WHERE anime_id=' . $anime['id']
+            );
+
+        return false;
     }
     
 
