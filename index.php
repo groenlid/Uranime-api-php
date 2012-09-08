@@ -10,6 +10,8 @@ require_once getcwd().'/rb.php';
 require_once getcwd().'/config/db.php';
 
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Methods: PUT, GET, POST, DELETE, OPTIONS');
 
 $r = new Restler();
 $r->setSupportedFormats('JsonFormat','JsonpFormat');
