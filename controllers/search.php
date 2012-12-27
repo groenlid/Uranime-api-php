@@ -1,83 +1,53 @@
-<?php
+<?php namespace controllers;
 class Search{
 
-    public function get($q=""){
-        
-        $tag_id = isset($_GET['tag_id']) ? $_GET['tag_id'] : null;
-        if($tag_id != null && !is_numeric($tag_id))
-            throw new RestException(400, "Wrong format of tag_id. Should be int");
 
-        else if($tag_id != null){
-            $anime_genre = R::find(
-                'anime_genre',
-                'genre_id = :genre_id',
-                array(
-                    'genre_id' => $tag_id
-                    )
-                );
-            $anime = array();
-            foreach($anime_genre as $singleGenre)
-            {
-                $anime_id = $singleGenre['anime_id'];
-                $anime[$anime_id] = R::load('anime',$anime_id);
-                $anime[$anime_id]['tags'] = R::find(
-                    'genre',
-                    'genre.id = :genre_id',
-                    array(
-                        'genre_id' => $singleGenre['genre_id']
-                    )
-                );
-
-                /* THIS FETCHES ALL THE TAGS FOR EACH ANIME.. TO BIG FOR ANDROID APP   
-                R::getAll(
-                    'SELECT genre.id, name, description
-                    FROM genre, anime_genre
-                    WHERE anime_genre.anime_id = :anime_id
-                    AND anime_genre.genre_id = genre.id
-                    ',
-                    array(
-                        ':anime_id' => $anime_id
-                    )
-                );
-                 */
-
-            }
-            return $anime;
-        }
-
-        if(isset($_GET['q']))
-            $q = strtolower(trim($_GET['q']));
-        if(empty($q))
-            throw new RestException(404,"No query given. Use ?q= to query");
-        $synonyms = R::find(
-            'anime_synonyms',
-            'lower(title) LIKE ?',
-            array(
-                 '%'.$q.'%'
-                )
-            );
-
-        $anime = array();
-        foreach($synonyms as $synonym)
-        {
-            $anime_id = $synonym['anime_id'];
-            if(array_key_exists($anime_id,$anime))
-                continue;
-            $anime[$anime_id] = R::load('anime',$anime_id);
-
-            // we need to add the synonyms to the result list.
-            $anime[$anime_id]['synonyms'] = R::find(
-                'anime_synonyms',
-                'anime_id = :anime_id',
-                array(
-                    'anime_id' => $anime_id
-                    )
-                );
-        
-        }
-
-        return $anime;
+    public function options($q = null, $tag = null) {
+        header( 'Allow: GET,PUT,POST,DELETE,OPTIONS' );
     }
 
+    /**
+     * Searches for anime that matches the given query string or is associated with the given tag id
+     * @param string q The search query. This has higher priority than tag id. Eg: bleach
+	 * @param int tag A given tag id. Eg: 
+	 **/
+    public function get($q=null, $tag= null){
+    	if($q == null && $tag == null)
+			throw new \RestException(400,"Need to specify either a query (?q=) or a tag id (?tag=)");
+		
+		if($q != null && trim($q) != "")
+		{
+			$synonyms = \Synonym::find('all', 
+				array(
+					'conditions' => array(
+						'lower(title) LIKE ?', 
+						'%' . strtolower($q) . '%'
+						)
+					)
+				);
+			$ids = array();	
+			$anime = array();
+			
+			foreach($synonyms as $a)
+			{
+				if(in_array($a->anime_id, $ids))
+					continue;
+				array_push($anime, $a->anime->to_array(array('include' => array('synonym'))));
+				array_push($ids,$a->anime_id);				
+			}
+			
+			return $anime;
+        }
+        else if($tag != null && is_numeric($tag))
+        {
+            $tag = \Genre::find($tag);
+            $genre_anime = $tag->anime;
+            $anime = array();
+            foreach($genre_anime as $a)
+                array_push($anime, $a->to_array());
+            return $anime;
+        }
+		die();
+		
+    }
 }
-

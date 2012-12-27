@@ -1,73 +1,39 @@
-<?php
+<?php namespace controllers;
 class Anime {
 
+    public function options($id)
+    {
+        return $this->get($id);
+    }
 
     /**
-     * Returns a collection of anime sorted by Anime.id
-     * Because of the size of the table, max amount is 25.
+     * Returns the anime with the given id
+     * @param int $id The anime id
+	 * @return Anime anime
      */
-    function get( $id = NULL )
+    public function get($id)
     {
-        // Check if :id equals null,
-        // means we should return all the anime
-        if($id == NULL)
-        {
-            // Need to fetch limit and/or offset
-            extract($this->getLimitOffset( 10, 25, 0));
-
-            $allAnime = R::findAll('anime', 'ORDER BY id DESC LIMIT :offset, :limit',
-                array(
-                    ':offset' => (int) $offset,
-                    ':limit' => (int) $limit,
-                )
-            );
-            return $allAnime;
-        }
-
         // Load specific anime
-        $anime = R::load('anime',$id);
-        
+        $anime = \Anime::find($id);
+		$episodes = $anime->episode;
+        return $anime->to_array(array(
+            'include' => array(
+                'episode',
+                'genre',
+                'synonym'
+            )
+        ));
+        /*
         // If only one anime is requested, we add the relationships.
         // (Episodes, Synonyms, etc)
         
         // We use manual finding of episodes instead of redbeans relationship
         // manager to choose variable name.
-        $episodes = R::find(
-            'episodes',
-            'anime_id = :anime_id ORDER BY aired DESC',
-            array(
-                'anime_id' => $id
-                ));//$anime->ownEpisodes;
-        
-        // Finding anime synonyms
-        $synonyms = R::find(
-            'anime_synonyms',
-            'anime_id = :anime_id',
-            array(
-                'anime_id' => $id
-                )
-            );
-
-        // Find the tags assosiated with the anime
-        $tags_rawSQL = R::getAll(
-            'SELECT genre.id, name, description, is_genre
-            FROM genre, anime_genre
-            WHERE anime_genre.anime_id = :anime_id
-            AND anime_genre.genre_id = genre.id
-            ',
-            array(
-                ':anime_id' => $id
-                )
-            );
-        $tags = array();
-
-        foreach($tags_rawSQL as $tag)
-            $tags[$tag['id']] = $tag;
         
         $auth = new Authenticate();
 
         // If the user is logged in..
-        if($auth->__isAuthenticated())
+        if($auth->__isAllowed())
         {
             $userid = Authenticate::$loggedInAs;
             
@@ -102,12 +68,35 @@ class Anime {
             }
         }
 
-        $anime->episodes = $episodes;
-        $anime->synonyms = $synonyms;
-        $anime->tags = $tags;
-        return $anime;
+        $anime = $anime->export();
+        $anime['episodes'] = R::exportAll($episodes);
+        $anime['synonyms'] = R::exportAll($synonyms);
+        $anime['tags'] = $tags;
+
+        return $anime;*/
     }
 
+    /**
+     * Returns a collection of anime sorted by Anime.id
+     * Because of the size of the table, max amount is 25.
+     */
+    function index($limit = 10, $offset = 0)
+    {
+        // Need to fetch limit and/or offset
+        //extract($this->getLimitOffset( 10, 25, 0));
+		$options = array(
+			'limit' => $limit,
+			'offset' => $offset
+		);
+		
+		$anime = array();
+		
+		$anime_result = \Anime::all($options);
+		foreach($anime_result as $a)
+			array_push($anime,$a->to_array());
+		return $anime;
+    }
+/*
     public function put($id = null, $request_data = null)
     {
         // Fetch the request_data
@@ -187,10 +176,10 @@ class Anime {
         return false;
     }
     
-
+*/
     /**
      * Updates the seen status for the given user on a specific episode
-     */
+     *//*
     private function updateEpisode($episode, $userid, $id)
     {
 
@@ -257,11 +246,11 @@ class Anime {
         }
         return FALSE;
     }
-
+*/
     /**
      * Update the watchlist timestamp for a given user and anime.
      * if null is specified as time, the record will be deleted
-     */
+     *//*
     private function updateWatchlist($request_data, $userid, $animeid)
     {
         // Check if the user sends a new value for the user watchlist 
@@ -303,7 +292,7 @@ class Anime {
             return FALSE;
         }
 
-    }
+    }*/
 
     /*
      * $defaultLimit: if limit is required in the url.

@@ -1,6 +1,7 @@
 <?php
 class Users {
     
+
     protected function get( $id = null ) {
         
         if($id == null)

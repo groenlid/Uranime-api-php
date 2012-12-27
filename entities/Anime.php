@@ -1,9 +1,13 @@
 <?php
-/**
- * @Entity @Table(name="anime")
- **/
-class Model_Anime extends Redbean_SimpleModel
+class Anime extends ActiveRecord\Model
 {
-    protected $id;
-    protected $title;
+    static $table_name = "anime";
+    
+    // Relations
+    static $has_many = array(
+        array('episode', 'class_name' => 'Episode'),
+        array('animegenre', 'class_name' => 'AnimeGenre'),
+        array('synonym', 'class_name' => 'Synonym'),
+        array('genre', 'class_name' => 'Genre', 'through' => 'animegenre')
+    );
 }

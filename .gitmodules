@@ -1,0 +1,9 @@
+[submodule "vendors/restler"]
+	path = vendors/restler
+	url = git://github.com/Luracast/Restler.git
+[submodule "vendors/ActiveRecord"]
+	path = vendors/ActiveRecord
+	url = https://github.com/kla/php-activerecord.git
+[submodule "vendors/oauth2-server-php"]
+	path = vendors/oauth2-server-php
+	url = https://github.com/bshaffer/oauth2-server-php.git

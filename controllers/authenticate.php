@@ -3,7 +3,7 @@ class Authenticate implements iAuthenticate {
     
     public static $loggedInAs = null;
     public $email = "a";
-    function __isAuthenticated() 
+    function __isAllowed() 
     {
 
         $headers = apache_request_headers();
