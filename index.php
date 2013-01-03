@@ -25,10 +25,12 @@ require_once __DIR__.'/config/db.php';
 
 // Entities
 require_once __DIR__.'/entities/Anime.php';
+require_once __DIR__.'/entities/UserEpisode.php';
 require_once __DIR__.'/entities/Episode.php';
 require_once __DIR__.'/entities/Genre.php';
 require_once __DIR__.'/entities/AnimeGenre.php';
 require_once __DIR__.'/entities/Synonym.php';
+require_once __DIR__.'/entities/User.php';
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -41,7 +43,7 @@ $r->addAPIClass('Luracast\\Restler\\Resources');
 $r->setSupportedFormats('JsonFormat');
 //$r->addAuthenticationClass('Authenticate');
 $r->addAPIClass('controllers\Anime');
-//$r->addAPIClass('Episodes');
+$r->addAPIClass('controllers\Episodes');
 //$r->addAPIClass('Users');
 $r->addAPIClass('controllers\Search');
 //$r->addAPIClass('Tags');

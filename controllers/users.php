@@ -1,14 +1,14 @@
 <?php
 class Users {
     
-
     protected function get( $id = null ) {
         
+        /*
         if($id == null)
             $id = Authenticate::$loggedInAs;
 
         if($id == null)
-            throw new RestException('401');
+            throw new RestException('401');*/
 
         // Find the anime the user has seen
         $userSeen = R::getAll(

@@ -1,9 +1,8 @@
 <?php namespace controllers;
 class Anime {
 
-    public function options($id)
-    {
-        return $this->get($id);
+    public function options($id) {
+        header( 'Allow: GET,PUT,POST,DELETE,OPTIONS' );
     }
 
     /**
@@ -15,14 +14,22 @@ class Anime {
     {
         // Load specific anime
         $anime = \Anime::find($id);
-		$episodes = $anime->episode;
-        return $anime->to_array(array(
+
+        
+        
+
+        //print_r($lastSeen);
+        $ret = $anime->to_array(array(
             'include' => array(
                 'episode',
                 'genre',
                 'synonym'
-            )
+            ),
+            'methods' => 'last_seen'
         ));
+        //$ret['activity'] = $lastSeen;
+        return $ret;
+
         /*
         // If only one anime is requested, we add the relationships.
         // (Episodes, Synonyms, etc)
